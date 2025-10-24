@@ -141,15 +141,16 @@ body {
 }
 
 .preview-text {
-  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   font-size: 13px;
   color: #1c1c1e;
   line-height: 1.4;
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
-  max-height: 60px;
-  overflow: hidden;
 }
 
 .image-preview {
@@ -215,4 +216,34 @@ body {
 .footer-hint {
   font-size: 11px;
   color: #8e8e93;
+}
+
+.filter {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  gap: 4px;
+  background: #f9f9f9;
+}
+
+.filter-button {
+  padding: 6px 12px;
+  border: 1px solid #d1d1d6;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #1c1c1e;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-button:hover {
+  background: #f5f5f7;
+  border-color: #007aff;
+}
+
+.filter-button.active {
+  background: #007aff;
+  color: #ffffff;
+  border-color: #007aff;
 }

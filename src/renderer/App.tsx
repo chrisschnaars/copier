@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [history, setHistory] = useState<ClipboardItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [filter, setFilter] = useState<"all" | "text" | "image">("all");
 
   useEffect(() => {
     // Load initial history
@@ -31,8 +32,15 @@ const App: React.FC = () => {
   }, []);
 
   const filteredHistory = history.filter((item) => {
-    if (!searchQuery) return true;
-    return item.preview.toLowerCase().includes(searchQuery.toLowerCase());
+    // Apply search filter
+    const matchesSearch =
+      !searchQuery ||
+      item.preview.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Apply type filter
+    const matchesType = filter === "all" || item.type === filter;
+
+    return matchesSearch && matchesType;
   });
 
   const handlePaste = useCallback((itemId: string) => {
@@ -118,6 +126,36 @@ const App: React.FC = () => {
         )}
       </div>
 
+      <div className="filter">
+        <button
+          className={`filter-button ${filter === "all" ? "active" : ""}`}
+          onClick={() => {
+            console.log("Setting filter to all");
+            setFilter("all");
+          }}
+        >
+          All
+        </button>
+        <button
+          className={`filter-button ${filter === "text" ? "active" : ""}`}
+          onClick={() => {
+            console.log("Setting filter to text");
+            setFilter("text");
+          }}
+        >
+          Text
+        </button>
+        <button
+          className={`filter-button ${filter === "image" ? "active" : ""}`}
+          onClick={() => {
+            console.log("Setting filter to image");
+            setFilter("image");
+          }}
+        >
+          Images
+        </button>
+      </div>
+
       <div className="clipboard-list">
         {filteredHistory.length === 0 ? (
           <div className="empty-state">
@@ -148,11 +186,7 @@ const App: React.FC = () => {
                       {item.type === "text" ? "📝" : "📄"}
                     </div>
                     <div className="item-text">
-                      {item.type === "text" ? (
-                        <span className="preview-text">{item.preview}</span>
-                      ) : (
-                        <span className="preview-text">{item.preview}</span>
-                      )}
+                      <span className="preview-text">{item.preview}</span>
                     </div>
                   </div>
                 )}

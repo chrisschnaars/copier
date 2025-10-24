@@ -43,7 +43,7 @@ function createWindow() {
     },
   });
 
-  // Position window near the menu bar
+  // Position window below the tray icon
   const windowBounds = mainWindow.getBounds();
   const x = Math.floor(width - windowBounds.width - 10);
   const y = 30;
@@ -62,16 +62,27 @@ function createWindow() {
       mainWindow.hide();
     }
   });
+
+  // Hide window when app loses focus
+  app.on("browser-window-blur", () => {
+    if (mainWindow && !mainWindow.webContents.isDevToolsOpened()) {
+      mainWindow.hide();
+    }
+  });
 }
 
 function createTray() {
-  // Create a simple icon for the tray (you can replace with a custom icon later)
-  const icon = nativeImage.createFromDataURL(
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADXSURBVFhH7ZbBDYMwDEVpR+AEXDgxAiMwAiMwQkfoCIzACRYgUqUqShPbBPWC/KQryvfzs+MkjuM4juPs4AHgDuAJ4PX3fAL4fjEaAM4ALl/MXQbgDeAMYABwb8wMV6QDWAE0AI4t0gG0AFoAxxbpAAYAI4Bji3QAPYAewLFFOoAJwAxgBnBskQ5gAbACWAEcW4SDEH8hmQEsAJa/ZzqIFcAKYAVwbJEOYADQAxgAHFukAxgBTABGAMcW6QB6AD2AHsCxRTqADcAGYANwbJEO4gLgBuAG4Ngi/3EcZ1ccvgH68yVXIL88VgAAAABJRU5ErkJggg=="
+  // Make it a template image for light/dark mode adaptation
+  const iconPath = path.join(
+    __dirname,
+    "../assets/icons/clipboard-logo@1x.png"
   );
 
+  const icon = nativeImage.createFromPath(iconPath);
+  icon.setTemplateImage(true);
+
   tray = new Tray(icon.resize({ width: 16, height: 16 }));
-  tray.setToolTip("Clipboard Manager");
+  tray.setToolTip("Copier");
 
   // Create context menu
   const contextMenu = Menu.buildFromTemplate([
@@ -89,14 +100,22 @@ function createTray() {
       if (mainWindow.isVisible()) {
         mainWindow.hide();
       } else {
+        // Position window below the tray icon
+        const trayBounds = tray!.getBounds();
+        const windowBounds = mainWindow.getBounds();
+        const x = Math.floor(
+          trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+        );
+        const y = Math.floor(trayBounds.y + trayBounds.height);
+        mainWindow.setPosition(x, y);
+
         mainWindow.show();
-        mainWindow.focus();
       }
     }
   });
 
   tray.on("right-click", () => {
-    tray?.popUpContextMenu();
+    contextMenu.popup();
   });
 }
 
