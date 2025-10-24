@@ -6,6 +6,7 @@ import {
   ipcMain,
   nativeImage,
   screen,
+  Menu,
 } from "electron";
 import * as path from "path";
 import Store from "electron-store";
@@ -72,6 +73,17 @@ function createTray() {
   tray = new Tray(icon.resize({ width: 16, height: 16 }));
   tray.setToolTip("Clipboard Manager");
 
+  // Create context menu
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Quit",
+      click: () => {
+        app.quit();
+      },
+    },
+  ]);
+
+  // Left click toggles window, right click shows context menu
   tray.on("click", () => {
     if (mainWindow) {
       if (mainWindow.isVisible()) {
@@ -81,6 +93,10 @@ function createTray() {
         mainWindow.focus();
       }
     }
+  });
+
+  tray.on("right-click", () => {
+    tray?.popUpContextMenu();
   });
 }
 
